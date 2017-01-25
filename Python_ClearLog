@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+#-*- coding: utf-8 -*-
+# ******************************************************************************
+# 功能描述:
+# ******************************************************************************
+
+import time
+import os
+import re
+import sys
+
+def Clear(LogName):
+    f = open('/data1/bi/datacenter/logs/py/'+ LogName,'r')
+    a = f.read()
+    if a.find('[2017-') != -1:
+        end = a.find('[2017-')
+        fp_des_keep = open('/data1/bi/usertest/user/lincoln/data/logs/' + LogName, 'wb')
+        f.seek(end, 0)
+        fp_des_keep.write(f.read())
+
+        f.seek(0, 2)
+        pos, begin = 0, 0
+        f.seek(begin)
+
+        fp_des_del = open('/data1/bi/usertest/user/lincoln/data/log_back/' + LogName, 'wb')
+        while pos < end:
+            line = f.readline()
+            fp_des_del.write(line)
+            pos = f.tell()
+
+        fp_des_keep.close()
+        del begin, end
+
+    else:
+        fp_des_del = open('/data1/bi/usertest/user/lincoln/data/log_back/' + LogName, 'wb')
+        fp_des_del.write(a)
+
+
+    f.close()
+    fp_des_del.close()
+    del a
+
+
+def tar_file_create():
+    tar_file_name = 'log_py_2014-2016.tar.gz'
+    tar_file_path = '/data1/bi/usertest/user/lincoln/data/' + tar_file_name
+    command = "cd " + '/data1/bi/usertest/user/lincoln/data/' + ";tar -zcvf " + tar_file_path + ' /data1/bi/usertest/user/lincoln/data/log_back'
+    os.system(command)
+    os.system("rm -rf " + '/data1/bi/usertest/user/lincoln/data/log_back')
+
+list_py_log = os.listdir('/data1/bi/datacenter/logs/py')
+
+for each in list_py_log:
+     Clear(each)
+
+tar_file_create()
+
